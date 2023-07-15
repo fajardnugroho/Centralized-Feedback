@@ -1,0 +1,90 @@
+---
+title: "Centralized Feedback Tech Doc"
+author: "Fajar Nugroho"
+date: "2023-07-12"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Centralized Feedback V.1
+
+```{r}
+
+reactable(iris, columnGroups = list(colGroup(name = "Sepal", 
+    columns = c("Sepal.Length", "Sepal.Width")), colGroup(name = "Petal", 
+    columns = c("Petal.Length", "Petal.Width"))), filterable = TRUE, 
+    searchable = TRUE, resizable = TRUE, showPageSizeOptions = TRUE, 
+    onClick = "expand", outlined = TRUE, bordered = TRUE, borderless = TRUE, 
+    striped = TRUE, highlight = TRUE, compact = TRUE, showSortable = TRUE, 
+    defaultSorted = c("Sepal.Length", "Sepal.Width"), height = "auto", 
+    columns = list(Sepal.Length = colDef(name = "Length", aggregate = "max", 
+        format = colFormat(suffix = " cm", digits = 1)), Sepal.Width = colDef(name = "Width", 
+        defaultSortOrder = "desc", aggregate = "mean", format = list(aggregated = colFormat(suffix = " (avg)", 
+            digits = 2)), cell = function(value) {
+                    if (value >= 3.3) {
+                      classes <- "tag num-high"
+                    } else if (value >= 3) {
+                      classes <- "tag num-med"
+                    } else {
+                      classes <- "tag num-low"
+                    }
+                    value <- format(value, nsmall = 1)
+                    span(class = classes, value)
+                  }, footer = function(values) {
+                    div(tags$b("Average: "), round(mean(values), 1))
+                  }, details = function(index) {
+                    tagList(
+                      paste("Details for row:", index),
+                      pre(paste(capture.output(iris[index, ]), collapse = "
+"))
+                    )
+                  }), Petal.Length = colDef(name = "Length", 
+        aggregate = "sum"), Petal.Width = colDef(name = "Width", 
+        aggregate = "count"), Species = colDef(aggregate = "frequency")), 
+    details = colDef(details = function(index) {
+          if (index == 3) {
+            tabsetPanel(
+              tabPanel("plot", plotOutput("plot")),
+              tabPanel("subtable", reactable(iris[1:3, 1:2], fullWidth = FALSE))
+            )
+          } else if (index == 5) {
+            paste("Details for row:", index)
+          }
+        }, name = "More", width = 70))
+
+```
+
+
+
+
+
+# Library
+
+```{r}
+
+library(tidyverse)
+library(reactable)
+library(shiny)
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
